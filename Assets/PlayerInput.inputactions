@@ -9,9 +9,10 @@
                     "name": "ToggleHelp",
                     "type": "Button",
                     "id": "a601469b-e3aa-422a-806a-4f7dcba55332",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Throttle",
@@ -19,7 +20,8 @@
                     "id": "0d46f8f2-2f6f-4fe2-8623-427c869c3bde",
                     "expectedControlType": "Axis",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "RollPitch",
@@ -27,7 +29,8 @@
                     "id": "7173b259-7215-456e-ba7f-dba1aaad27e1",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Yaw",
@@ -35,7 +38,8 @@
                     "id": "56c160cd-3545-4284-abef-8d6eb62ab74c",
                     "expectedControlType": "Axis",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Camera",
@@ -43,39 +47,53 @@
                     "id": "cdd2542b-3da6-4431-be9c-bbf306e4dcd5",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "ToggleFlaps",
                     "type": "Button",
                     "id": "0e572958-b17b-4a43-950d-d9a9324fbc89",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "FireMissile",
                     "type": "Button",
                     "id": "54bc0053-bbe2-45cd-80b6-dd2a4f0dee6d",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "FireCannon",
                     "type": "Button",
                     "id": "cc901d01-643f-4c28-918b-23ed83f6433c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "ToggleAI",
                     "type": "Button",
                     "id": "b0d256fa-cc8c-4a22-925d-479ad7049947",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "New action",
+                    "type": "Value",
+                    "id": "7c46cb02-4dc1-435d-97e8-1e09db9e3a7e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -113,6 +131,39 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "1D Axis",
+                    "id": "636e0212-9e40-46c9-a53e-4eb2f75afde9",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "e8179e45-f086-4ef8-929b-d9691b8148e9",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "f6dd178d-4a9f-4ba5-96fd-fd2273f492c8",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "9114f377-1c7f-4991-a591-b668ae086658",
                     "path": "<Gamepad>/leftStick",
@@ -122,6 +173,61 @@
                     "action": "RollPitch",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "55503315-2df5-4246-945f-b0f0dc72faa0",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollPitch",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "777c17cb-cdad-434c-8d25-5ca8a5b0b0af",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollPitch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "3603d627-3836-4755-83b0-1bf36bd8631d",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollPitch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "978d8a75-d8cd-4276-9d2e-59573baaaabe",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollPitch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "b3d37eca-2119-4d37-9588-073159f2ad63",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollPitch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "1D Axis",
@@ -157,6 +263,39 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "1D Axis",
+                    "id": "a9bdcce7-3bcc-4c57-9435-5cbdaf29a7c1",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Yaw",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "8f62a5e6-b774-4a44-a59c-831e7aa147a4",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Yaw",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "9de6f04b-a728-47ed-9ab1-3e449a82dd6f",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Yaw",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "45163a0d-825d-4388-9771-5cc782697311",
                     "path": "<Gamepad>/rightStick",
@@ -168,9 +307,75 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "2D Vector",
+                    "id": "4389ab2c-2400-4444-83eb-4802076806d2",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "8c0116ab-fa44-427f-84dd-73cf8e01569e",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "fd780e29-4eaf-4093-855b-1bbd96f23e1f",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "e6b4ca01-15e3-4c4b-b073-e04d1b7d5ee1",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "82f5a314-2b62-4b5f-9d93-d0be1e8775de",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "8b4e38a0-f793-4d60-bcda-53f58cf07745",
                     "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleFlaps",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0cb3b083-d7c6-4adc-a835-d5d4fbdb6362",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -202,6 +407,17 @@
                 },
                 {
                     "name": "",
+                    "id": "3ba08a07-4941-4637-b861-7c9e1a12c093",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FireMissile",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "f8cd153b-2c78-4690-b96d-88366b14cb64",
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
@@ -213,12 +429,45 @@
                 },
                 {
                     "name": "",
-                    "id": "d71bddd5-5fbb-4ffd-a940-080749cc27ad",
+                    "id": "4eadebbc-3740-4777-b2ed-219b2459ebcb",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FireCannon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "91b7170d-08d7-4c38-b6c7-aa080bf7326a",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
+                    "action": "FireCannon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d71bddd5-5fbb-4ffd-a940-080749cc27ad",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "ToggleAI",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26c5a6ea-3e81-437c-8466-ce26e7321f17",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

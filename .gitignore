@@ -1,0 +1,25 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+Logs/
+MemoryCaptures/
+UserSettings/
+
+# Visual Studio
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.pidb
+
+# Unity generated
+*.apk
+*.aab
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

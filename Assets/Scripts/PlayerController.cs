@@ -43,10 +43,7 @@ public class PlayerController : MonoBehaviour {
         if (plane == null) return;
         if (aiController.enabled) return;
 
-        float input = context.ReadValue<float>();
-        Debug.Log($"[Throttle] Input recibido: {input}");
-        plane.SetThrottleInput(input);
-
+        plane.SetThrottleInput(context.ReadValue<float>());
     }
 
     public void OnRollPitchInput(InputAction.CallbackContext context) {

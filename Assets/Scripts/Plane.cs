@@ -1,8 +1,18 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Plane : MonoBehaviour {
+public struct PlaneNetworkInput : INetworkInput
+{
+    public float throttle;
+    public Vector2 pitchRoll;
+    public float yaw;
+    public bool fireCannon;
+    public bool fireMissile;
+}
+
+public class Plane : NetworkBehaviour {
     [SerializeField]
     float maxHealth;
     [SerializeField]
@@ -198,6 +208,7 @@ public class Plane : MonoBehaviour {
     void Start() {
         animation = GetComponent<PlaneAnimation>();
         Rigidbody = GetComponent<Rigidbody>();
+
 
         if (landingGear.Count > 0) {
             landingGearDefaultMaterial = landingGear[0].sharedMaterial;
@@ -530,8 +541,46 @@ public class Plane : MonoBehaviour {
         }
     }
 
+    public void ApplyInput(PlaneNetworkInput input)
+    {
+        Debug.Log($"[Input Fusion] Throttle: {input.throttle} | PitchRoll: {input.pitchRoll} | Yaw: {input.yaw}");
+        SetThrottleInput(input.throttle);
+        SetControlInput(new Vector3(input.pitchRoll.y, input.yaw, -input.pitchRoll.x));
+
+        if (input.fireCannon) SetCannonInput(true);
+        else SetCannonInput(false);
+
+        if (input.fireMissile) TryFireMissile();
+    }
+
+    public override void Spawned()
+    {
+        if (HasInputAuthority)
+        {
+            var mainCamera = Camera.main;
+            var planeCamera = mainCamera.GetComponent<PlaneCamera>();
+
+            if (planeCamera != null)
+            {
+                planeCamera.SetPlane(this); // Asignamos esta instancia de avión al seguidor
+            }
+        }
+    }
+
     void FixedUpdate() {
         float dt = Time.fixedDeltaTime;
+
+        if (HasInputAuthority)
+        {
+            if (GetInput(out PlaneNetworkInput input))
+            {
+                ApplyInput(input); // [✅ NUEVO: aplicamos el input recibido por red]
+            }
+        }
+        else
+        {
+            return; // No simular si no somos el dueño del avión
+        }
 
         //calculate at start, to capture any changes that happened externally
         CalculateState(dt);

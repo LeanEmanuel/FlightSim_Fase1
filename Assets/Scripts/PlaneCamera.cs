@@ -32,6 +32,14 @@ public class PlaneCamera : MonoBehaviour {
 
     void Awake() {
         cameraTransform = camera.GetComponent<Transform>();
+
+        // Desactiva la cámara si no es el jugador local
+         var netObj = GetComponentInParent<Fusion.NetworkObject>();
+        if (netObj != null && !netObj.HasInputAuthority)
+        {
+           camera.gameObject.SetActive(false); // Desactiva la cámara si no tiene autoridad
+           enabled = false;                    // Opcional: desactiva el script
+        }
     }
 
     public void SetPlane(Plane plane) {
@@ -44,6 +52,12 @@ public class PlaneCamera : MonoBehaviour {
         }
 
         cameraTransform.SetParent(planeTransform);
+
+        // Aquí forzamos la posición y rotación inicial
+        var initialRotation = Quaternion.Euler(-lookAverage.y, lookAverage.x, 0);
+        var turningRotation = Quaternion.Euler(Vector3.zero); // aún no hay movimiento
+        cameraTransform.localPosition = initialRotation * turningRotation * cameraOffset;
+        cameraTransform.localRotation = initialRotation * turningRotation;
     }
 
     public void SetInput(Vector2 input) {

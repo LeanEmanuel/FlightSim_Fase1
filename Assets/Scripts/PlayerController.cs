@@ -102,6 +102,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
+        if (!plane.HasInputAuthority) return;
         if (plane == null) return;
         if (aiController.enabled) return;
 

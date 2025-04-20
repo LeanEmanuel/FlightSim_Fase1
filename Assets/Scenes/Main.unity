@@ -904,6 +904,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 3125381894734340706, guid: 1c011298a92114145abb99280ceaedab, type: 3}
+  spawnPointsTeamA:
+  - {fileID: 2126569053}
+  - {fileID: 688826497}
+  spawnPointsTeamB:
+  - {fileID: 151903580}
+  - {fileID: 251171993}
 --- !u!114 &787053492
 MonoBehaviour:
   m_ObjectHideFlags: 0

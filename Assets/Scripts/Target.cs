@@ -15,13 +15,13 @@ public class Target : MonoBehaviour {
 
     public Vector3 Position {
         get {
-            return rigidbody.position;
+            return rigidbody != null ? rigidbody.position : transform.position;
         }
     }
 
     public Vector3 Velocity {
         get {
-            return rigidbody.linearVelocity;
+            return rigidbody != null ? rigidbody.linearVelocity : Vector3.zero;
         }
     }
 

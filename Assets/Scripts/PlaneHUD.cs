@@ -279,6 +279,7 @@ public class PlaneHUD : MonoBehaviour {
     }
 
     void UpdateWarnings() {
+        if (selfTarget == null || plane == null || plane.Rigidbody == null || cameraTransform == null) return;
         var incomingMissile = selfTarget.GetIncomingMissile();
 
         if (incomingMissile != null) {
@@ -313,9 +314,18 @@ public class PlaneHUD : MonoBehaviour {
         }
     }
 
+    public void UpdateHealthBar(float current, float max)
+    {
+        if (healthBar != null)
+            healthBar.SetValue(current / max);
+
+        if (healthText != null)
+            healthText.text = $"{current:0}";
+    }
+
     void LateUpdate() {
-        if (plane == null) return;
-        if (camera == null) return;
+        if (plane == null || camera == null) return;
+        if (plane.Rigidbody == null || planeTransform == null || cameraTransform == null) return;
 
         float degreesToPixels = camera.pixelHeight / camera.fieldOfView;
 

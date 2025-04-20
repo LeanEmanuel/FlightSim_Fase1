@@ -5,7 +5,9 @@ using Fusion;
 
 public class Plane : NetworkBehaviour
 {
-    [Networked, OnChangedRender(nameof(OnHealthChanged))] public float Health { get; private set; }
+    [Networked, OnChangedRender(nameof(OnHealthChanged))] 
+    public float Health { get; private set; }
+
     [Networked] public float MaxHealth { get; private set; }
     [SerializeField]
     private GameObject playerPlanePrefab;
@@ -137,6 +139,7 @@ public class Plane : NetworkBehaviour
         Health = MaxHealth;
     }
 
+
     public void OnHealthChanged()
     {
         Debug.Log($"[HUD] Vida actualizada (cliente): {Health}");
@@ -150,6 +153,7 @@ public class Plane : NetworkBehaviour
             }
         }
     }
+
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ApplyDamage(float damage)

@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlaneNetworkController : NetworkBehaviour
 {
     private Plane plane;
+    [SerializeField] private GameObject hudPrefab;
 
     public override void Spawned()
     {
@@ -17,6 +18,18 @@ public class PlaneNetworkController : NetworkBehaviour
             if (planeCam != null && plane != null)
             {
                 planeCam.SetPlane(plane);
+            }
+
+            //Instanciar HUD SOLO para el jugador local
+            if (hudPrefab != null && mainCam != null)
+            {
+                var hudInstance = Instantiate(hudPrefab);
+                var hud = hudInstance.GetComponent<PlaneHUD>();
+                if (hud != null)
+                {
+                    hud.SetPlane(plane);
+                    hud.SetCamera(mainCam);
+                }
             }
         }
     }

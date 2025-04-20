@@ -14,6 +14,11 @@ public class PitchBar : MonoBehaviour {
         image = GetComponent<Image>();
         transforms = new List<Transform>();
 
+        if (texts == null || texts.Count == 0)
+        {
+            Debug.LogWarning("PitchBar: No texts assigned in inspector.");
+        }
+
         foreach (var text in texts) {
             transforms.Add(text.GetComponent<Transform>());
         }
@@ -26,6 +31,8 @@ public class PitchBar : MonoBehaviour {
     }
 
     public void UpdateRoll(float angle) {
+        if (transforms == null || transforms.Count == 0) return;
+
         foreach (var transform in transforms) {
             transform.localEulerAngles = new Vector3(0, 0, angle);
         }

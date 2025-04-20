@@ -1280,6 +1280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3490a03a4bd4e3f4c87c303c0aaf7ea7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hudPrefab: {fileID: 1227854715464682154, guid: d38b66ab2063d5f439b2227fec552339, type: 3}
 --- !u!114 &1097153573909080245
 MonoBehaviour:
   m_ObjectHideFlags: 0

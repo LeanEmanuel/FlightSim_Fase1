@@ -8,6 +8,8 @@ public class Plane : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnHealthChanged))] public float Health { get; private set; }
     [Networked] public float MaxHealth { get; private set; }
     [SerializeField]
+    private GameObject playerPlanePrefab;
+    [SerializeField]
     float maxThrust;
     [SerializeField]
     float throttleSpeed;
@@ -636,8 +638,11 @@ public class Plane : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (HasStateAuthority == false) return;
         float dt = Runner.DeltaTime;
+        CheckAndRecoverAuthority();
+
+        if (HasStateAuthority == false) return;
+        
 
         //calculate at start, to capture any changes that happened externally
         CalculateState(dt);
@@ -683,6 +688,21 @@ public class Plane : NetworkBehaviour
         if (Health == 0 && MaxHealth != 0 && !Dead)
         {
             Die();
+        }
+    }
+    private void CheckAndRecoverAuthority()
+    {
+        if (Object.HasInputAuthority && !Object.HasStateAuthority)
+        {
+            Debug.LogWarning($"[!] {gameObject.name} perdió StateAuthority pero tiene InputAuthority. Intentando recuperar...");
+
+            if (Runner.IsServer) // solo el servidor puede reasignar
+            {
+                Runner.Despawn(Object);
+
+                var newPlane = Runner.Spawn(playerPlanePrefab, transform.position, transform.rotation, Object.InputAuthority);
+                Debug.Log($"✅ StateAuthority reasignada a {Object.InputAuthority.PlayerId}");
+            }
         }
     }
 

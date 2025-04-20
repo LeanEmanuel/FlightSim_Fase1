@@ -716,6 +716,7 @@ GameObject:
   - component: {fileID: -3250471116453751225}
   - component: {fileID: 1097153573909080245}
   - component: {fileID: 5386761359609738060}
+  - component: {fileID: 3251523681169006588}
   m_Layer: 3
   m_Name: F15_Player
   m_TagString: Untagged
@@ -825,8 +826,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5585d18e17682b468f5ee1b417e5df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  health: 100
+  _Health: 0
+  _MaxHealth: 0
+  playerPlanePrefab: {fileID: 0}
   maxThrust: 222411
   throttleSpeed: 1
   gLimit: 4
@@ -1262,12 +1264,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 1879830204
   ObjectInterest: 1
-  Flags: 262145
+  Flags: 786433
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 970848378784693653}
   - {fileID: -3250471116453751225}
   - {fileID: 1097153573909080245}
+  - {fileID: 3251523681169006588}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-3250471116453751225
 MonoBehaviour:
@@ -1312,6 +1315,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   name: F-15
+--- !u!114 &3251523681169006588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3125381894734340706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57541b6bbd006f6448c22f927196e46a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPlanePrefab: {fileID: 8899503314767005025}
 --- !u!1 &3252836953483622565
 GameObject:
   m_ObjectHideFlags: 0

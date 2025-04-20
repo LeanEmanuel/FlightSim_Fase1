@@ -45,14 +45,27 @@ public class PlaneNetworkController : NetworkBehaviour
     public bool AssignTarget()
     {
         var allTargets = FindObjectsOfType<Target>();
+        float closestDistance = float.MaxValue;
+        Target closestTarget = null;
+
         foreach (var t in allTargets)
         {
-            if (t.Plane != plane && t.Plane != null)
+            if (t.Plane == null || t.Plane == plane || t.Plane.Dead)
+                continue;
+
+            float dist = Vector3.Distance(plane.transform.position, t.transform.position);
+            if (dist < closestDistance)
             {
-                plane.SetTarget(t);
-                Debug.Log($"{plane.name} ha asignado como target a {t.Name}");
-                return true;
+                closestDistance = dist;
+                closestTarget = t;
             }
+        }
+
+        if (closestTarget != null)
+        {
+            plane.SetTarget(closestTarget);
+            Debug.Log($"{plane.name} ha asignado como target más cercano a {closestTarget.Name} (distancia: {closestDistance:F1})");
+            return true;
         }
 
         return false;
@@ -61,8 +74,15 @@ public class PlaneNetworkController : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (plane == null) return; // protección contra null
+                                   
+        if (targetAssigned && (plane.Target == null || plane.Target.Plane == null || plane.Target.Plane.Dead))
+        {
+            Debug.LogWarning($"⚠️ Target inválido. Reasignando...");
+            targetAssigned = false;
+            plane.SetTarget(null);
+        }
 
-        // Si aún no hay target, intenta asignarlo periódicamente
+        // Reintentar asignación si no hay target válido
         if (!targetAssigned)
         {
             retryAssignTimer -= Runner.DeltaTime;
@@ -77,8 +97,8 @@ public class PlaneNetworkController : NetworkBehaviour
                     retryAssignTimer = 1f; // volver a intentar en 1 segundo
                 }
             }
-
         }
+
         if (HasInputAuthority && GetInput<PlaneNetworkInput>(out var input))
         {
             plane.SetThrottleInput(input.throttle);

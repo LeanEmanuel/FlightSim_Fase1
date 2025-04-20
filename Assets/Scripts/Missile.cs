@@ -1,83 +1,101 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Fusion;
 using UnityEngine;
 
-public class Missile : MonoBehaviour {
-    [SerializeField]
-    float lifetime;
-    [SerializeField]
-    float speed;
-    [SerializeField]
-    float trackingAngle;
-    [SerializeField]
-    float damage;
-    [SerializeField]
-    float damageRadius;
-    [SerializeField]
-    float turningGForce;
-    [SerializeField]
-    LayerMask collisionMask;
-    [SerializeField]
-    new MeshRenderer renderer;
-    [SerializeField]
-    GameObject explosionGraphic;
+public class Missile : NetworkBehaviour
+{
+    [SerializeField] private float lifetime;
+    [SerializeField] private float speed;
+    [SerializeField] private float trackingAngle;
+    [SerializeField] private float damage;
+    [SerializeField] private float damageRadius;
+    [SerializeField] private float turningGForce;
+    [SerializeField] private LayerMask collisionMask;
+    [SerializeField] private GameObject explosionGraphic;
 
-    Plane owner;
-    Target target;
-    bool exploded;
-    Vector3 lastPosition;
-    float timer;
+    private Plane owner;
+    private Target target;
+    private float timer;
+    private bool exploded;
+    private Vector3 lastPosition;
 
-    public Rigidbody Rigidbody { get; private set; }
+    private Rigidbody rb;
+    public Rigidbody Rigidbody => rb;
 
-    public void Launch(Plane owner, Target target) {
-        this.owner = owner;
-        this.target = target;
-
-        Rigidbody = GetComponent<Rigidbody>();
-
-        lastPosition = Rigidbody.position;
-        timer = lifetime;
-
-        if (target!= null) target.NotifyMissileLaunched(this, true);
+    public override void Spawned()
+    {
+        rb = GetComponent<Rigidbody>();
+        lastPosition = transform.position;
+        explosionGraphic.SetActive(false);
     }
 
-    void Explode() {
-        if (exploded) return;
-
+    public void Launch(Plane owner, Target target)
+    {
+        this.owner = owner;
+        this.target = target;
         timer = lifetime;
-        Rigidbody.isKinematic = true;
-        renderer.enabled = false;
-        exploded = true;
-        explosionGraphic.SetActive(true);
 
-        var hits = Physics.OverlapSphere(Rigidbody.position, damageRadius, collisionMask.value);
+        if (target != null)
+            target.NotifyMissileLaunched(this, true);
+    }
 
-        foreach (var hit in hits) {
-            Plane other = hit.gameObject.GetComponent<Plane>();
+    public override void FixedUpdateNetwork()
+    {
+        if (!HasStateAuthority || exploded) return;
 
-            if (other != null && other != owner) {
-                other.ApplyDamage(damage);
+        // asegurar de que el Rigidbody no sea null
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+            if (rb == null)
+            {
+                Debug.LogError($"[Missile] Rigidbody ES NULL en {gameObject.name}. Abortando movimiento.");
+                return;
             }
         }
 
-        if (target != null) target.NotifyMissileLaunched(this, false);
+        if (rb == null || transform == null)
+        {
+            Debug.LogWarning($"{gameObject.name}: componentes críticos faltan.");
+            return;
+        }
+
+        //explode missile automatically after lifetime ends
+        //timer is reused to keep missile graphics alive after explosion
+        timer -= Runner.DeltaTime;
+        if (timer <= 0f)
+        {
+            Explode();
+            return;
+        }
+
+        CheckCollision();
+        TrackTarget(Runner.DeltaTime);
+
+        // Protección reforzada
+        try
+        {
+            rb.linearVelocity = transform.forward * speed;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[Missile] Error al asignar velocidad: {e.Message}");
+            return;
+        }
+        lastPosition = transform.position;
     }
 
-    void CheckCollision() {
-        //missile can travel very fast, collision may not be detected by physics system
-        //use raycasts to check for collisions
+    //missile can travel very fast, collision may not be detected by physics system
+    //use raycasts to check for collisions
+    private void CheckCollision()
+    {
+        Vector3 currentPosition = transform.position;
+        Vector3 movement = currentPosition - lastPosition;
 
-        var currentPosition = Rigidbody.position;
-        var error = currentPosition - lastPosition;
-        var ray = new Ray(lastPosition, error.normalized);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, error.magnitude, collisionMask.value)) {
-            Plane other = hit.collider.gameObject.GetComponent<Plane>();
-
-            if (other == null || other != owner) {
-                Rigidbody.position = hit.point;
+        if (Physics.Raycast(lastPosition, movement.normalized, out RaycastHit hit, movement.magnitude, collisionMask))
+        {
+            if (hit.collider.GetComponent<Plane>() != owner)
+            {
+                transform.position = hit.point;
                 Explode();
             }
         }
@@ -85,47 +103,57 @@ public class Missile : MonoBehaviour {
         lastPosition = currentPosition;
     }
 
-    void TrackTarget(float dt) {
+    private void TrackTarget(float dt)
+    {
         if (target == null) return;
 
-        var targetPosition = Utilities.FirstOrderIntercept(Rigidbody.position, Vector3.zero, speed, target.Position, target.Velocity);
+        Vector3 interceptPoint = Utilities.FirstOrderIntercept(
+            transform.position,
+            Vector3.zero,
+            speed,
+            target.Position,
+            target.Velocity
+        );
 
-        var error = targetPosition - Rigidbody.position;
-        var targetDir = error.normalized;
-        var currentDir = Rigidbody.rotation * Vector3.forward;
+        Vector3 targetDir = (interceptPoint - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, targetDir);
 
         //if angle to target is too large, explode
-        if (Vector3.Angle(currentDir, targetDir) > trackingAngle) {
+        if (angle > trackingAngle)
+        {
             Explode();
             return;
         }
 
         //calculate turning rate from G Force and speed
-        float maxTurnRate = (turningGForce * 9.81f) / speed;  //radians / s
-        var dir = Vector3.RotateTowards(currentDir, targetDir, maxTurnRate * dt, 0);
-
-        Rigidbody.rotation = Quaternion.LookRotation(dir);
+        float maxTurnRate = (turningGForce * 9.81f) / speed; //radians / s
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, maxTurnRate * dt, 0f);
+        transform.rotation = Quaternion.LookRotation(newDir);
     }
 
-    void FixedUpdate() {
-        timer = Mathf.Max(0, timer - Time.fixedDeltaTime);
+    private void Explode()
+    {
+        if (exploded) return;
 
-        //explode missile automatically after lifetime ends
-        //timer is reused to keep missile graphics alive after explosion
-        if (timer == 0) {
-            if (exploded) {
-                Destroy(gameObject);
-            } else {
-                Explode();
+        exploded = true;
+        explosionGraphic.SetActive(true);
+        rb.isKinematic = true;
+
+        Collider[] hits = Physics.OverlapSphere(transform.position, damageRadius, collisionMask);
+        foreach (var hit in hits)
+        {
+            Plane plane = hit.GetComponent<Plane>();
+            if (plane != null && plane != owner)
+            {
+                plane.ApplyDamage(damage);
             }
         }
 
-        if (exploded) return;
+        if (target != null)
+        {
+            target.NotifyMissileLaunched(this, false);
+        }
 
-        CheckCollision();
-        TrackTarget(Time.fixedDeltaTime);
-
-        //set speed to direction of travel
-        Rigidbody.linearVelocity = Rigidbody.rotation * new Vector3(0, 0, speed);
+        Runner.Despawn(Object);
     }
 }

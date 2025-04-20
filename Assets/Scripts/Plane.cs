@@ -5,10 +5,8 @@ using Fusion;
 
 public class Plane : NetworkBehaviour
 {
-    [SerializeField]
-    float maxHealth;
-    [SerializeField]
-    float health;
+    [Networked, OnChangedRender(nameof(OnHealthChanged))] public float Health { get; private set; }
+    [Networked] public float MaxHealth { get; private set; }
     [SerializeField]
     float maxThrust;
     [SerializeField]
@@ -129,43 +127,32 @@ public class Plane : NetworkBehaviour
     bool cannonFiring;
     float cannonDebounceTimer;
     float cannonFiringTimer;
+    private bool previousMissileLocked;
 
-    public float MaxHealth
+    public void InitHealth(float max)
     {
-        get
+        MaxHealth = Mathf.Max(0, max);
+        Health = MaxHealth;
+    }
+
+    public void OnHealthChanged()
+    {
+        Debug.Log($"[HUD] Vida actualizada (cliente): {Health}");
+
+        if (Object.HasInputAuthority)
         {
-            return maxHealth;
-        }
-        set
-        {
-            maxHealth = Mathf.Max(0, value);
+            var hud = FindObjectOfType<PlaneHUD>();
+            if (hud != null)
+            {
+                hud.UpdateHealthBar(Health, MaxHealth);
+            }
         }
     }
 
-    public float Health
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ApplyDamage(float damage)
     {
-        get
-        {
-            return health;
-        }
-        private set
-        {
-            health = Mathf.Clamp(value, 0, maxHealth);
-
-            if (health <= MaxHealth * .5f && health > 0)
-            {
-                damageEffect.SetActive(true);
-            }
-            else
-            {
-                damageEffect.SetActive(false);
-            }
-
-            if (health == 0 && MaxHealth != 0 && !Dead)
-            {
-                Die();
-            }
-        }
+        ApplyDamage(damage);
     }
 
     public bool Dead { get; private set; }
@@ -234,6 +221,13 @@ public class Plane : NetworkBehaviour
         missileLockDirection = Vector3.forward;
 
         Rigidbody.linearVelocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
+
+        // inicializar vida en el host
+        if (HasStateAuthority)
+        {
+            InitHealth(100);
+        }
+        OnHealthChanged();
     }
     /*
     void Start()
@@ -286,7 +280,11 @@ public class Plane : NetworkBehaviour
 
     public void ApplyDamage(float damage)
     {
-        Health -= damage;
+
+        if (!HasStateAuthority) return;
+        float oldHealth = Health;
+        Health = Mathf.Max(Health - damage, 0);
+        Debug.Log($"{gameObject.name} ha recibido {damage} de daño — Vida: {oldHealth} → {Health}");
     }
 
     void Die()
@@ -551,9 +549,11 @@ public class Plane : NetworkBehaviour
     void FireMissile(int index)
     {
         var hardpoint = hardpoints[index];
-        var missileGO = Instantiate(missilePrefab, hardpoint.position, hardpoint.rotation);
-        var missile = missileGO.GetComponent<Missile>();
-        missile.Launch(this, MissileLocked ? Target : null);
+        var missileObj = Runner.Spawn(missilePrefab, hardpoint.position, hardpoint.rotation, Object.InputAuthority);
+        if (missileObj.TryGetComponent<Missile>(out var missile))
+        {
+            missile.Launch(this, MissileLocked ? Target : null);
+        }
     }
 
     void UpdateWeapons(float dt)
@@ -602,6 +602,13 @@ public class Plane : NetworkBehaviour
         missileLockDirection = Vector3.RotateTowards(missileLockDirection, targetDir, Mathf.Deg2Rad * lockSpeed * dt, 0);
 
         MissileLocked = Target != null && MissileTracking && Vector3.Angle(missileLockDirection, targetDir) < lockSpeed * dt;
+
+        // LOG solo si el estado cambia
+        if (!previousMissileLocked && MissileLocked)
+        {
+            Debug.Log($"{gameObject.name} HA BLOQUEADO a {Target?.Name}");
+        }
+        previousMissileLocked = MissileLocked;
     }
 
     void UpdateCannon(float dt)
@@ -612,10 +619,19 @@ public class Plane : NetworkBehaviour
 
             var spread = Random.insideUnitCircle * cannonSpread;
 
-            var bulletGO = Instantiate(bulletPrefab, cannonSpawnPoint.position, cannonSpawnPoint.rotation * Quaternion.Euler(spread.x, spread.y, 0));
-            var bullet = bulletGO.GetComponent<Bullet>();
-            bullet.Fire(this);
+            var rotation = cannonSpawnPoint.rotation * Quaternion.Euler(spread.x, spread.y, 0);
+            var bulletObj = Runner.Spawn(bulletPrefab, cannonSpawnPoint.position, rotation, Object.StateAuthority);
+            if (bulletObj.TryGetComponent<Bullet>(out var bullet))
+            {
+                bullet.Fire(this);
+            }
         }
+    }
+
+    public void SetTarget(Target newTarget)
+    {
+        if (!HasStateAuthority) return;
+        target = newTarget;
     }
 
     public override void FixedUpdateNetwork()
@@ -654,6 +670,20 @@ public class Plane : NetworkBehaviour
 
         //update weapon state
         UpdateWeapons(dt);
+
+        if (Health <= MaxHealth * 0.5f && Health > 0)
+        {
+            damageEffect.SetActive(true);
+        }
+        else
+        {
+            damageEffect.SetActive(false);
+        }
+
+        if (Health == 0 && MaxHealth != 0 && !Dead)
+        {
+            Die();
+        }
     }
 
     void OnCollisionEnter(Collision collision)

@@ -314,6 +314,15 @@ public class PlaneHUD : MonoBehaviour {
         }
     }
 
+    public void UpdateHealthBar(float current, float max)
+    {
+        if (healthBar != null)
+            healthBar.SetValue(current / max);
+
+        if (healthText != null)
+            healthText.text = $"{current:0}";
+    }
+
     void LateUpdate() {
         if (plane == null || camera == null) return;
         if (plane.Rigidbody == null || planeTransform == null || cameraTransform == null) return;

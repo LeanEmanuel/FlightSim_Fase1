@@ -39,10 +39,16 @@ public class PitchBar : MonoBehaviour {
     }
 
     public void UpdateColor(Color color) {
-        image.color = color;
+        if (image != null)
+            image.color = color;
 
-        foreach (var text in texts) {
-            text.color = color;
+        if (texts != null)
+        {
+            foreach (var text in texts)
+            {
+                if (text != null)
+                    text.color = color;
+            }
         }
     }
 }

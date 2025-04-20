@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: -7281642871779554129}
   - component: {fileID: 2669934981140404944}
   - component: {fileID: 6363495856932316362}
+  - component: {fileID: -2857140050314122949}
+  - component: {fileID: -8148210352357028723}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -46,13 +48,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c8fba0f142b9840b9b423e66ef56eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 15
-  lifetime: 5
   speed: 1000
+  damage: 15
+  lifeTime: 2
   collisionMask:
     serializedVersion: 2
-    m_Bits: 0
-  width: 2.5
+    m_Bits: 4294967295
 --- !u!120 &2669934981140404944
 LineRenderer:
   serializedVersion: 2
@@ -187,3 +188,40 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-2857140050314122949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2669934981140404945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 605789013
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: -7281642871779554129}
+  - {fileID: -8148210352357028723}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &-8148210352357028723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2669934981140404945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 1

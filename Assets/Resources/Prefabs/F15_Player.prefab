@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7663232529786046503}
   - component: {fileID: 6803388498000145299}
   - component: {fileID: 2635956171961611305}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Canopy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8156642704100532087}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Hardpoint2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 974085741812833102}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Afterburner1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -161,7 +161,7 @@ GameObject:
   - component: {fileID: 8748121076658964168}
   - component: {fileID: 190459637204736726}
   - component: {fileID: 3318897693862047505}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Wings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +246,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4634334034211589534}
   - component: {fileID: 4312980952054853287}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Gear2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,7 +302,7 @@ GameObject:
   - component: {fileID: 1554488347856350221}
   - component: {fileID: 6160112459514168144}
   - component: {fileID: 7883988709473501713}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Cockpit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 6673145587972541092}
   - component: {fileID: 6094595659042043395}
   - component: {fileID: 1800222010383716720}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: UpperFuselage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,7 +474,7 @@ GameObject:
   - component: {fileID: 920043154689601425}
   - component: {fileID: 4411045504461859388}
   - component: {fileID: 6077569817084088752}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: RightFlap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -558,7 +558,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6051212791931602079}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Afterburner2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -592,7 +592,7 @@ GameObject:
   - component: {fileID: 887658338587839732}
   - component: {fileID: 8293766893133211013}
   - component: {fileID: 796250379305317049}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: RightAileron
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -676,7 +676,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2482670236911435020}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Hardpoint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -715,7 +715,8 @@ GameObject:
   - component: {fileID: 8899503314767005025}
   - component: {fileID: -3250471116453751225}
   - component: {fileID: 1097153573909080245}
-  m_Layer: 8
+  - component: {fileID: 5386761359609738060}
+  m_Layer: 3
   m_Name: F15_Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -774,7 +775,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -801,7 +802,7 @@ Rigidbody:
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1298,6 +1299,19 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 1
+--- !u!114 &5386761359609738060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3125381894734340706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e18d00c010aab047afd893019ac2ced, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: F-15
 --- !u!1 &3252836953483622565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,7 +1321,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5654309236378104774}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Cannon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1323,7 +1337,7 @@ Transform:
   m_GameObject: {fileID: 3252836953483622565}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.876, y: 0.125, z: 4.619}
+  m_LocalPosition: {x: 1.13, y: 0.125, z: 7.53}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1340,7 +1354,7 @@ GameObject:
   - component: {fileID: 3543717414220408357}
   - component: {fileID: 8369789388542302892}
   - component: {fileID: 5410516840485870383}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: LeftElevator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1426,7 +1440,7 @@ GameObject:
   - component: {fileID: 8536978310437763529}
   - component: {fileID: 4096771911501482924}
   - component: {fileID: 3681930039700944198}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: LeftFlap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1512,7 +1526,7 @@ GameObject:
   - component: {fileID: 2501057673390311463}
   - component: {fileID: 1315894269660679010}
   - component: {fileID: 5149339370932775129}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Rudders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1598,7 +1612,7 @@ GameObject:
   - component: {fileID: 909707140897627809}
   - component: {fileID: 3681376640047267450}
   - component: {fileID: 5868945209756307915}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: RightRudder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1684,7 +1698,7 @@ GameObject:
   - component: {fileID: 2478336299360680200}
   - component: {fileID: 1788437469314801551}
   - component: {fileID: 1867934524280899457}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Airbrake
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1769,7 +1783,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7040054537325781642}
   - component: {fileID: 3377290085170846289}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Gear3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1825,7 +1839,7 @@ GameObject:
   - component: {fileID: 6799136456170807517}
   - component: {fileID: 2064276249876983171}
   - component: {fileID: 8465631342173183584}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: LeftRudder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1911,7 +1925,7 @@ GameObject:
   - component: {fileID: 4646795313027089970}
   - component: {fileID: 4833093453449939193}
   - component: {fileID: 4513443732789765977}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: LeftAileron
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1997,7 +2011,7 @@ GameObject:
   - component: {fileID: 3905130250540470717}
   - component: {fileID: 3357005737083809584}
   - component: {fileID: 4298566997014030360}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Nose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2083,7 +2097,7 @@ GameObject:
   - component: {fileID: 4698610534523286854}
   - component: {fileID: 3584743976250996284}
   - component: {fileID: 3778813604986460222}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: RightElevator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2168,7 +2182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5247392499159641985}
   - component: {fileID: 8629623507546989391}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Gear1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2224,7 +2238,7 @@ GameObject:
   - component: {fileID: 6813050182717987713}
   - component: {fileID: 1068619157151822223}
   - component: {fileID: 1588286103784875096}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Engines
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2310,7 +2324,7 @@ GameObject:
   - component: {fileID: 2911958486593048609}
   - component: {fileID: 1336845490602336120}
   - component: {fileID: 7508128603215347472}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Fuselage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2447,7 +2461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: dd3d7065258cc4f40b6713630d03a2e4, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2526,7 +2540,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: dd3d7065258cc4f40b6713630d03a2e4, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2557,7 +2571,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8116138975141828757, guid: e64ae45176ab9bf40b2103f37b94d2f8, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8116138975141828757, guid: e64ae45176ab9bf40b2103f37b94d2f8, type: 3}
       propertyPath: m_IsActive
@@ -2637,6 +2651,10 @@ PrefabInstance:
     - target: {fileID: 2251377857669893060, guid: 10eb1785a1ab13a4cb9f88c3cc74eec3, type: 3}
       propertyPath: m_Name
       value: PlaneSmoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 2251377857669893060, guid: 10eb1785a1ab13a4cb9f88c3cc74eec3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2251377857669893060, guid: 10eb1785a1ab13a4cb9f88c3cc74eec3, type: 3}
       propertyPath: m_IsActive
@@ -2759,7 +2777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8348422454787297666, guid: 55d909449977d3f498214c5b65eab6af, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2829,7 +2847,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8348422454787297666, guid: 55d909449977d3f498214c5b65eab6af, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

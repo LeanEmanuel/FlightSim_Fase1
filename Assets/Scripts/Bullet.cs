@@ -1,54 +1,77 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Fusion;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour {
-    [SerializeField]
-    float damage;
-    [SerializeField]
-    float lifetime;
-    [SerializeField]
-    float speed;
-    [SerializeField]
-    LayerMask collisionMask;
-    [SerializeField]
-    float width;
+public class Bullet : NetworkBehaviour
+{
+    [SerializeField] private float speed = 100f;
+    [SerializeField] private float damage = 10f;
+    [SerializeField] private float lifeTime = 2f;
+    [SerializeField] private LayerMask collisionMask;
 
-    Plane owner;
-    new Rigidbody rigidbody;
-    Vector3 lastPosition;
-    float startTime;
+    private float timer;
+    private Plane owner;
 
-    public void Fire(Plane owner) {
+    public void Fire(Plane owner)
+    {
         this.owner = owner;
-        rigidbody = GetComponent<Rigidbody>();
-        startTime = Time.time;
+        timer = lifeTime;
 
-        rigidbody.AddRelativeForce(new Vector3(0, 0, speed), ForceMode.VelocityChange);
-        rigidbody.AddForce(owner.Rigidbody.linearVelocity, ForceMode.VelocityChange);
-        lastPosition = rigidbody.position;
+        // Ignorar colisión con el propio avión
+        Collider ownerCollider = owner.GetComponent<Collider>();
+        Collider bulletCollider = GetComponent<Collider>();
+
+        if (ownerCollider != null && bulletCollider != null)
+        {
+            Physics.IgnoreCollision(bulletCollider, ownerCollider);
+            Debug.Log("🛡️ Ignorando colisión entre bala y avión que la disparó.");
+        }
+
+        Debug.Log($"🟢 Bala creada por: {owner.gameObject.name} con ID: {owner.GetInstanceID()}");
     }
 
-    void FixedUpdate() {
-        if (Time.time > startTime + lifetime) {
-            Destroy(gameObject);
+    public override void FixedUpdateNetwork()
+    {
+        if (timer <= 0)
+        {
+            Runner.Despawn(Object);
             return;
         }
 
-        var diff = rigidbody.position - lastPosition;
-        lastPosition = rigidbody.position;
+        float step = speed * Runner.DeltaTime;
+        Vector3 direction = transform.forward;
 
-        Ray ray = new Ray(lastPosition, diff.normalized);
-        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, step, collisionMask))
+        {
+            Debug.Log($"Bala impactó en {hit.collider.gameObject.name}");
+            Plane hitPlane = hit.collider.GetComponent<Plane>();
 
-        if (Physics.SphereCast(ray, width, out hit, diff.magnitude, collisionMask.value)) {
-            Plane other = hit.collider.GetComponent<Plane>();
+            if (hitPlane != null)
+            {
+                
+                Debug.Log($"🎯 Impactó a: {hitPlane.gameObject.name} con ID: {hitPlane.GetInstanceID()}");
 
-            if (other != null && other != owner) {
-                other.ApplyDamage(damage);
+                if (hitPlane.Object.Id == owner.Object.Id)
+                {
+                    Debug.Log("⚠️ El avión impactado es el mismo que disparó (mismo ID de red).");
+                }
+                else
+                {
+                    Debug.Log("✅ Avión enemigo impactado.");
+                }
+
+                if (hitPlane.Object.Id != owner.Object.Id && HasStateAuthority)
+                {
+                    Debug.Log("✅ Enviando RPC de daño al enemigo...");
+                    hitPlane.RPC_ApplyDamage(damage); // ✅ esto va al dueño real
+                }
             }
 
-            Destroy(gameObject);
+            Runner.Despawn(Object);
+            return;
         }
+
+        transform.position += direction * step;
+        timer -= Runner.DeltaTime;
     }
 }
+

@@ -1,18 +1,10 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
-public struct PlaneNetworkInput : INetworkInput
+public class Plane : NetworkBehaviour
 {
-    public float throttle;
-    public Vector2 pitchRoll;
-    public float yaw;
-    public bool fireCannon;
-    public bool fireMissile;
-}
-
-public class Plane : NetworkBehaviour {
     [SerializeField]
     float maxHealth;
     [SerializeField]
@@ -138,29 +130,39 @@ public class Plane : NetworkBehaviour {
     float cannonDebounceTimer;
     float cannonFiringTimer;
 
-    public float MaxHealth {
-        get {
+    public float MaxHealth
+    {
+        get
+        {
             return maxHealth;
         }
-        set {
+        set
+        {
             maxHealth = Mathf.Max(0, value);
         }
     }
 
-    public float Health {
-        get {
+    public float Health
+    {
+        get
+        {
             return health;
         }
-        private set {
+        private set
+        {
             health = Mathf.Clamp(value, 0, maxHealth);
 
-            if (health <= MaxHealth * .5f && health > 0) {
+            if (health <= MaxHealth * .5f && health > 0)
+            {
                 damageEffect.SetActive(true);
-            } else {
+            }
+            else
+            {
                 damageEffect.SetActive(false);
             }
 
-            if (health == 0 && MaxHealth != 0 && !Dead) {
+            if (health == 0 && MaxHealth != 0 && !Dead)
+            {
                 Die();
             }
         }
@@ -179,14 +181,18 @@ public class Plane : NetworkBehaviour {
     public float AngleOfAttackYaw { get; private set; }
     public bool AirbrakeDeployed { get; private set; }
 
-    public bool FlapsDeployed {
-        get {
+    public bool FlapsDeployed
+    {
+        get
+        {
             return flapsDeployed;
         }
-        private set {
+        private set
+        {
             flapsDeployed = value;
 
-            foreach (var lg in landingGear) {
+            foreach (var lg in landingGear)
+            {
                 lg.enabled = value;
             }
         }
@@ -194,29 +200,34 @@ public class Plane : NetworkBehaviour {
 
     public bool MissileLocked { get; private set; }
     public bool MissileTracking { get; private set; }
-    public Target Target {
-        get {
+    public Target Target
+    {
+        get
+        {
             return target;
         }
     }
-    public Vector3 MissileLockDirection {
-        get {
+    public Vector3 MissileLockDirection
+    {
+        get
+        {
             return Rigidbody.rotation * missileLockDirection;
         }
     }
 
-    void Start() {
+    public override void Spawned()
+    {
         animation = GetComponent<PlaneAnimation>();
         Rigidbody = GetComponent<Rigidbody>();
 
-
-        if (landingGear.Count > 0) {
+        if (landingGear.Count > 0)
+        {
             landingGearDefaultMaterial = landingGear[0].sharedMaterial;
         }
 
         missileReloadTimers = new List<float>(hardpoints.Count);
-
-        foreach (var h in hardpoints) {
+        foreach (var h in hardpoints)
+        {
             missileReloadTimers.Add(0);
         }
 
@@ -224,33 +235,62 @@ public class Plane : NetworkBehaviour {
 
         Rigidbody.linearVelocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
     }
+    /*
+    void Start()
+    {
+        animation = GetComponent<PlaneAnimation>();
+        Rigidbody = GetComponent<Rigidbody>();
 
-    public void SetThrottleInput(float input) {
+        if (landingGear.Count > 0)
+        {
+            landingGearDefaultMaterial = landingGear[0].sharedMaterial;
+        }
+
+        missileReloadTimers = new List<float>(hardpoints.Count);
+
+        foreach (var h in hardpoints)
+        {
+            missileReloadTimers.Add(0);
+        }
+
+        missileLockDirection = Vector3.forward;
+
+        Rigidbody.linearVelocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
+    }
+    */
+    public void SetThrottleInput(float input)
+    {
         if (Dead) return;
         throttleInput = input;
     }
 
-    public void SetControlInput(Vector3 input) {
+    public void SetControlInput(Vector3 input)
+    {
         if (Dead) return;
         controlInput = Vector3.ClampMagnitude(input, 1);
     }
 
-    public void SetCannonInput(bool input) {
+    public void SetCannonInput(bool input)
+    {
         if (Dead) return;
         cannonFiring = input;
     }
 
-    public void ToggleFlaps() {
-        if (LocalVelocity.z < flapsRetractSpeed) {
+    public void ToggleFlaps()
+    {
+        if (LocalVelocity.z < flapsRetractSpeed)
+        {
             FlapsDeployed = !FlapsDeployed;
         }
     }
 
-    public void ApplyDamage(float damage) {
+    public void ApplyDamage(float damage)
+    {
         Health -= damage;
     }
 
-    void Die() {
+    void Die()
+    {
         throttleInput = 0;
         Throttle = 0;
         Dead = true;
@@ -260,7 +300,8 @@ public class Plane : NetworkBehaviour {
         deathEffect.SetActive(true);
     }
 
-    void UpdateThrottle(float dt) {
+    void UpdateThrottle(float dt)
+    {
         float target = 0;
         if (throttleInput > 0) target = 1;
 
@@ -270,25 +311,34 @@ public class Plane : NetworkBehaviour {
 
         AirbrakeDeployed = Throttle == 0 && throttleInput == -1;
 
-        if (AirbrakeDeployed) {
-            foreach (var lg in landingGear) {
+        if (AirbrakeDeployed)
+        {
+            foreach (var lg in landingGear)
+            {
                 lg.sharedMaterial = landingGearBrakesMaterial;
             }
-        } else {
-            foreach (var lg in landingGear) {
+        }
+        else
+        {
+            foreach (var lg in landingGear)
+            {
                 lg.sharedMaterial = landingGearDefaultMaterial;
             }
         }
     }
 
-    void UpdateFlaps() {
-        if (LocalVelocity.z > flapsRetractSpeed) {
+    void UpdateFlaps()
+    {
+        if (LocalVelocity.z > flapsRetractSpeed)
+        {
             FlapsDeployed = false;
         }
     }
 
-    void CalculateAngleOfAttack() {
-        if (LocalVelocity.sqrMagnitude < 0.1f) {
+    void CalculateAngleOfAttack()
+    {
+        if (LocalVelocity.sqrMagnitude < 0.1f)
+        {
             AngleOfAttack = 0;
             AngleOfAttackYaw = 0;
             return;
@@ -298,14 +348,16 @@ public class Plane : NetworkBehaviour {
         AngleOfAttackYaw = Mathf.Atan2(LocalVelocity.x, LocalVelocity.z);
     }
 
-    void CalculateGForce(float dt) {
+    void CalculateGForce(float dt)
+    {
         var invRotation = Quaternion.Inverse(Rigidbody.rotation);
         var acceleration = (Velocity - lastVelocity) / dt;
         LocalGForce = invRotation * acceleration;
         lastVelocity = Velocity;
     }
 
-    void CalculateState(float dt) {
+    void CalculateState(float dt)
+    {
         var invRotation = Quaternion.Inverse(Rigidbody.rotation);
         Velocity = Rigidbody.linearVelocity;
         LocalVelocity = invRotation * Velocity;  //transform world velocity into local space
@@ -314,11 +366,13 @@ public class Plane : NetworkBehaviour {
         CalculateAngleOfAttack();
     }
 
-    void UpdateThrust() {
+    void UpdateThrust()
+    {
         Rigidbody.AddRelativeForce(Throttle * maxThrust * Vector3.forward);
     }
 
-    void UpdateDrag() {
+    void UpdateDrag()
+    {
         var lv = LocalVelocity;
         var lv2 = lv.sqrMagnitude;  //velocity squared
 
@@ -339,7 +393,8 @@ public class Plane : NetworkBehaviour {
         Rigidbody.AddRelativeForce(drag);
     }
 
-    Vector3 CalculateLift(float angleOfAttack, Vector3 rightAxis, float liftPower, AnimationCurve aoaCurve, AnimationCurve inducedDragCurve) {
+    Vector3 CalculateLift(float angleOfAttack, Vector3 rightAxis, float liftPower, AnimationCurve aoaCurve, AnimationCurve inducedDragCurve)
+    {
         var liftVelocity = Vector3.ProjectOnPlane(LocalVelocity, rightAxis);    //project velocity onto YZ plane
         var v2 = liftVelocity.sqrMagnitude;                                     //square of velocity
 
@@ -360,7 +415,8 @@ public class Plane : NetworkBehaviour {
         return lift + inducedDrag;
     }
 
-    void UpdateLift() {
+    void UpdateLift()
+    {
         if (LocalVelocity.sqrMagnitude < 1f) return;
 
         float flapsLiftPower = FlapsDeployed ? this.flapsLiftPower : 0;
@@ -379,13 +435,15 @@ public class Plane : NetworkBehaviour {
         Rigidbody.AddRelativeForce(yawForce);
     }
 
-    void UpdateAngularDrag() {
+    void UpdateAngularDrag()
+    {
         var av = LocalAngularVelocity;
         var drag = av.sqrMagnitude * -av.normalized;    //squared, opposite direction of angular velocity
         Rigidbody.AddRelativeTorque(Vector3.Scale(drag, angularDrag), ForceMode.Acceleration);  //ignore rigidbody mass
     }
 
-    Vector3 CalculateGForce(Vector3 angularVelocity, Vector3 velocity) {
+    Vector3 CalculateGForce(Vector3 angularVelocity, Vector3 velocity)
+    {
         //estiamte G Force from angular velocity and velocity
         //Velocity = AngularVelocity * Radius
         //G = Velocity^2 / R
@@ -395,7 +453,8 @@ public class Plane : NetworkBehaviour {
         return Vector3.Cross(angularVelocity, velocity);
     }
 
-    Vector3 CalculateGForceLimit(Vector3 input) {
+    Vector3 CalculateGForceLimit(Vector3 input)
+    {
         return Utilities.Scale6(input,
             gLimit, gLimitPitch,    //pitch down, pitch up
             gLimit, gLimit,         //yaw
@@ -403,8 +462,10 @@ public class Plane : NetworkBehaviour {
         ) * 9.81f;
     }
 
-    float CalculateGLimiter(Vector3 controlInput, Vector3 maxAngularVelocity) {
-        if (controlInput.magnitude < 0.01f) {
+    float CalculateGLimiter(Vector3 controlInput, Vector3 maxAngularVelocity)
+    {
+        if (controlInput.magnitude < 0.01f)
+        {
             return 1;
         }
 
@@ -414,7 +475,8 @@ public class Plane : NetworkBehaviour {
         var limit = CalculateGForceLimit(maxInput);
         var maxGForce = CalculateGForce(Vector3.Scale(maxInput, maxAngularVelocity), LocalVelocity);
 
-        if (maxGForce.magnitude > limit.magnitude) {
+        if (maxGForce.magnitude > limit.magnitude)
+        {
             //example:
             //maxGForce = 16G, limit = 8G
             //so this is 8 / 16 or 0.5
@@ -424,13 +486,15 @@ public class Plane : NetworkBehaviour {
         return 1;
     }
 
-    float CalculateSteering(float dt, float angularVelocity, float targetVelocity, float acceleration) {
+    float CalculateSteering(float dt, float angularVelocity, float targetVelocity, float acceleration)
+    {
         var error = targetVelocity - angularVelocity;
         var accel = acceleration * dt;
         return Mathf.Clamp(error, -accel, accel);
     }
 
-    void UpdateSteering(float dt) {
+    void UpdateSteering(float dt)
+    {
         var speed = Mathf.Max(0, LocalVelocity.z);
         var steeringPower = steeringCurve.Evaluate(speed);
 
@@ -462,13 +526,16 @@ public class Plane : NetworkBehaviour {
         );
     }
 
-    public void TryFireMissile() {
+    public void TryFireMissile()
+    {
         if (Dead) return;
 
         //try all available missiles
-        for (int i = 0; i < hardpoints.Count; i++) {
+        for (int i = 0; i < hardpoints.Count; i++)
+        {
             var index = (missileIndex + i) % hardpoints.Count;
-            if (missileDebounceTimer == 0 && missileReloadTimers[index] == 0) {
+            if (missileDebounceTimer == 0 && missileReloadTimers[index] == 0)
+            {
                 FireMissile(index);
 
                 missileIndex = (index + 1) % hardpoints.Count;
@@ -481,43 +548,51 @@ public class Plane : NetworkBehaviour {
         }
     }
 
-    void FireMissile(int index) {
+    void FireMissile(int index)
+    {
         var hardpoint = hardpoints[index];
         var missileGO = Instantiate(missilePrefab, hardpoint.position, hardpoint.rotation);
         var missile = missileGO.GetComponent<Missile>();
         missile.Launch(this, MissileLocked ? Target : null);
     }
 
-    void UpdateWeapons(float dt) {
+    void UpdateWeapons(float dt)
+    {
         UpdateWeaponCooldown(dt);
         UpdateMissileLock(dt);
         UpdateCannon(dt);
     }
 
-    void UpdateWeaponCooldown(float dt) {
+    void UpdateWeaponCooldown(float dt)
+    {
         missileDebounceTimer = Mathf.Max(0, missileDebounceTimer - dt);
         cannonDebounceTimer = Mathf.Max(0, cannonDebounceTimer - dt);
         cannonFiringTimer = Mathf.Max(0, cannonFiringTimer - dt);
 
-        for (int i = 0; i < missileReloadTimers.Count; i++) {
+        for (int i = 0; i < missileReloadTimers.Count; i++)
+        {
             missileReloadTimers[i] = Mathf.Max(0, missileReloadTimers[i] - dt);
 
-            if (missileReloadTimers[i] == 0) {
+            if (missileReloadTimers[i] == 0)
+            {
                 animation.ShowMissileGraphic(i, true);
             }
         }
     }
 
-    void UpdateMissileLock(float dt) {
+    void UpdateMissileLock(float dt)
+    {
         //default neutral position is forward
         Vector3 targetDir = Vector3.forward;
         MissileTracking = false;
 
-        if (Target != null && !Target.Plane.Dead) {
+        if (Target != null && !Target.Plane.Dead)
+        {
             var error = target.Position - Rigidbody.position;
             var errorDir = Quaternion.Inverse(Rigidbody.rotation) * error.normalized; //transform into local space
 
-            if (error.magnitude <= lockRange && Vector3.Angle(Vector3.forward, errorDir) <= lockAngle) {
+            if (error.magnitude <= lockRange && Vector3.Angle(Vector3.forward, errorDir) <= lockAngle)
+            {
                 MissileTracking = true;
                 targetDir = errorDir;
             }
@@ -529,8 +604,10 @@ public class Plane : NetworkBehaviour {
         MissileLocked = Target != null && MissileTracking && Vector3.Angle(missileLockDirection, targetDir) < lockSpeed * dt;
     }
 
-    void UpdateCannon(float dt) {
-        if (cannonFiring && cannonFiringTimer == 0) {
+    void UpdateCannon(float dt)
+    {
+        if (cannonFiring && cannonFiringTimer == 0)
+        {
             cannonFiringTimer = 60f / cannonFireRate;
 
             var spread = Random.insideUnitCircle * cannonSpread;
@@ -541,46 +618,9 @@ public class Plane : NetworkBehaviour {
         }
     }
 
-    public void ApplyInput(PlaneNetworkInput input)
+    public override void FixedUpdateNetwork()
     {
-        Debug.Log($"[Input Fusion] Throttle: {input.throttle} | PitchRoll: {input.pitchRoll} | Yaw: {input.yaw}");
-        SetThrottleInput(input.throttle);
-        SetControlInput(new Vector3(input.pitchRoll.y, input.yaw, -input.pitchRoll.x));
-
-        if (input.fireCannon) SetCannonInput(true);
-        else SetCannonInput(false);
-
-        if (input.fireMissile) TryFireMissile();
-    }
-
-    public override void Spawned()
-    {
-        if (HasInputAuthority)
-        {
-            var mainCamera = Camera.main;
-            var planeCamera = mainCamera.GetComponent<PlaneCamera>();
-
-            if (planeCamera != null)
-            {
-                planeCamera.SetPlane(this); // Asignamos esta instancia de avión al seguidor
-            }
-        }
-    }
-
-    void FixedUpdate() {
         float dt = Time.fixedDeltaTime;
-
-        if (HasInputAuthority)
-        {
-            if (GetInput(out PlaneNetworkInput input))
-            {
-                ApplyInput(input); // [✅ NUEVO: aplicamos el input recibido por red]
-            }
-        }
-        else
-        {
-            return; // No simular si no somos el dueño del avión
-        }
 
         //calculate at start, to capture any changes that happened externally
         CalculateState(dt);
@@ -590,12 +630,15 @@ public class Plane : NetworkBehaviour {
         //handle user input
         UpdateThrottle(dt);
 
-        if (!Dead) {
+        if (!Dead)
+        {
             //apply updates
             UpdateThrust();
             UpdateLift();
             UpdateSteering(dt);
-        } else {
+        }
+        else
+        {
             //align with velocity
             Vector3 up = Rigidbody.rotation * Vector3.up;
             Vector3 forward = Rigidbody.linearVelocity.normalized;
@@ -612,11 +655,14 @@ public class Plane : NetworkBehaviour {
         UpdateWeapons(dt);
     }
 
-    void OnCollisionEnter(Collision collision) {
-        for (int i = 0; i < collision.contactCount; i++) {
+    void OnCollisionEnter(Collision collision)
+    {
+        for (int i = 0; i < collision.contactCount; i++)
+        {
             var contact = collision.contacts[i];
 
-            if (landingGear.Contains(contact.thisCollider)) {
+            if (landingGear.Contains(contact.thisCollider))
+            {
                 return;
             }
 
@@ -626,7 +672,8 @@ public class Plane : NetworkBehaviour {
             Rigidbody.position = contact.point;
             Rigidbody.rotation = Quaternion.Euler(0, Rigidbody.rotation.eulerAngles.y, 0);
 
-            foreach (var go in graphics) {
+            foreach (var go in graphics)
+            {
                 go.SetActive(false);
             }
 

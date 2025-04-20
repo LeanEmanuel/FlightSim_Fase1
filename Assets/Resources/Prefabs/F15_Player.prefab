@@ -714,6 +714,7 @@ GameObject:
   - component: {fileID: 9094169350098180157}
   - component: {fileID: 8899503314767005025}
   - component: {fileID: 4184011895057740539}
+  - component: {fileID: -3250471116453751225}
   m_Layer: 8
   m_Name: F15_Player
   m_TagString: Untagged
@@ -1265,6 +1266,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 970848378784693653}
   - {fileID: 4184011895057740539}
+  - {fileID: -3250471116453751225}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4184011895057740539
 MonoBehaviour:
@@ -1283,6 +1285,18 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &-3250471116453751225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3125381894734340706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3490a03a4bd4e3f4c87c303c0aaf7ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3252836953483622565
 GameObject:
   m_ObjectHideFlags: 0

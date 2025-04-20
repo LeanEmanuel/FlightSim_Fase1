@@ -10,7 +10,7 @@ public class PlayerSpawner : SimulationBehaviour, IPlayerJoined
         if (player == Runner.LocalPlayer)
         {
             // Spawneamos el avión con autoridad
-            Runner.Spawn(PlayerPrefab, new Vector3(0, 2, 0), Quaternion.identity, player);
+            Runner.Spawn(PlayerPrefab, new Vector3(0, 5, 0), Quaternion.identity, player);
 
         }
     }

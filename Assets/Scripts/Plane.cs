@@ -620,7 +620,8 @@ public class Plane : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        float dt = Time.fixedDeltaTime;
+        if (HasStateAuthority == false) return;
+        float dt = Runner.DeltaTime;
 
         //calculate at start, to capture any changes that happened externally
         CalculateState(dt);

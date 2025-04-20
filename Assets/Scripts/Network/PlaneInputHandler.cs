@@ -16,6 +16,7 @@ public class PlaneInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+
         PlaneNetworkInput data = new PlaneNetworkInput
         {
             throttle = Input.GetKey(KeyCode.W) ? 1f : Input.GetKey(KeyCode.S) ? -1f : 0f,
@@ -25,9 +26,10 @@ public class PlaneInputHandler : MonoBehaviour, INetworkRunnerCallbacks
     ),
             yaw = Input.GetKey(KeyCode.A) ? -1f : Input.GetKey(KeyCode.D) ? 1f : 0f,
             fireCannon = Input.GetKey(KeyCode.Space),
-            fireMissile = Input.GetKeyDown(KeyCode.M)
+            fireMissile = Input.GetKeyDown(KeyCode.M),
+            
         };
-
+        data.buttons.Set((int)PlaneButtons.ToggleHelp, Input.GetKey(KeyCode.H));
         input.Set(data);
     }
 

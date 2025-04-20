@@ -315,7 +315,7 @@ MonoBehaviour:
   missileArrowThreshold: 30
   cannonRange: 1000
   bulletSpeed: 1000
-  aiMessage: {fileID: 311637730151124418}
+  aiMessage: {fileID: 0}
   missileWarningGraphics:
   - {fileID: 5238810139578861052}
   - {fileID: 758836200396056319}
@@ -1827,28 +1827,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'L Stick - Roll/Pitch
-
-    R Stick - Camera
-
-    Triggers - Yaw
-
-    R
-    Bumper - Throttle Up
-
-    L Bumper - Throttle Down (Hold for Airbrake)
-
-    D-Pad
-    Down - Toggle flaps and landing gear
-
-    A - Fire Cannon
-
-    B - Launch Missile
-
-    Space
-    - Toggle AI on your plane
-
-    H - Close help dialog'
+  m_Text: "Up-Down - Pitch\nLeft-Right - Roll\nA - Yaw \nD - Yaw\nW Bumper - Throttle
+    Up\nS Bumper - Throttle Down (Hold for Airbrake)\nSpace - Fire Cannon\nM - Launch
+    Missile\nH - Close help dialog"
 --- !u!114 &3993222871752627458
 MonoBehaviour:
   m_ObjectHideFlags: 0

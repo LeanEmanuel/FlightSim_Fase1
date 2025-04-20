@@ -8,4 +8,9 @@ public struct PlaneNetworkInput : INetworkInput
     public float yaw;
     public NetworkBool fireCannon;
     public NetworkBool fireMissile;
+    public NetworkButtons buttons;
+}
+public enum PlaneButtons
+{
+    ToggleHelp = 0
 }

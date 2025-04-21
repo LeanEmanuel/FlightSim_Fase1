@@ -57,8 +57,8 @@ Actualmente permite a dos jugadores:
 ## 📸 Capturas de pantalla
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_1.png" width="400" />
-  <img src="docs/screenshots/screenshot_2.png" width="400" />
+  <img src="docs/screenshot_1.png" width="600" /><br/><br/>
+  <img src="docs/screenshot_2.png" width="600" />
 </p>
 
 <div align="center">

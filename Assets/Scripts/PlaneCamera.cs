@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaneCamera : MonoBehaviour {
+/// <summary>
+/// Controls the camera follow system for the player-controlled aircraft.
+/// Smoothly interpolates position and rotation based on aircraft movement,
+/// look input, and death state.
+/// </summary>
+public class PlaneCamera : MonoBehaviour
+{
     [SerializeField]
     new Camera camera;
     [SerializeField]
@@ -30,24 +36,36 @@ public class PlaneCamera : MonoBehaviour {
     Vector2 lookAverage;
     Vector3 avAverage;
 
-    void Awake() {
+    /// <summary>
+    /// Initializes references and disables the camera if this is not the local player.
+    /// </summary>
+    void Awake()
+    {
         cameraTransform = camera.GetComponent<Transform>();
 
         // Desactiva la cámara si no es el jugador local
-         var netObj = GetComponentInParent<Fusion.NetworkObject>();
+        var netObj = GetComponentInParent<Fusion.NetworkObject>();
         if (netObj != null && !netObj.HasInputAuthority)
         {
-           camera.gameObject.SetActive(false); // Desactiva la cámara si no tiene autoridad
-           enabled = false;                    // Opcional: desactiva el script
+            camera.gameObject.SetActive(false); // Desactiva la cámara si no tiene autoridad
+            enabled = false;                    // Opcional: desactiva el script
         }
     }
 
-    public void SetPlane(Plane plane) {
+    /// <summary>
+    /// Assigns the plane to follow and sets the camera's initial transform.
+    /// </summary>
+    /// <param name="plane">Plane object to follow.</param>
+    public void SetPlane(Plane plane)
+    {
         this.plane = plane;
 
-        if (plane == null) {
+        if (plane == null)
+        {
             planeTransform = null;
-        } else {
+        }
+        else
+        {
             planeTransform = plane.GetComponent<Transform>();
         }
 
@@ -60,16 +78,27 @@ public class PlaneCamera : MonoBehaviour {
         cameraTransform.localRotation = initialRotation * turningRotation;
     }
 
-    public void SetInput(Vector2 input) {
+    /// <summary>
+    /// Sets the current camera look input (e.g., from mouse or stick).
+    /// </summary>
+    /// <param name="input">Look direction input vector.</param>
+    public void SetInput(Vector2 input)
+    {
         lookInput = input;
     }
 
-    void LateUpdate() {
+    /// <summary>
+    /// Applies smoothed camera movement and rotation every frame,
+    /// following the aircraft and reacting to its angular velocity.
+    /// </summary>
+    void LateUpdate()
+    {
         if (plane == null) return;
 
         var cameraOffset = this.cameraOffset;
 
-        if (plane.Dead) {
+        if (plane.Dead)
+        {
             look += lookInput * deathSensitivity * Time.deltaTime;
             look.x = (look.x + 360f) % 360f;
             look.y = Mathf.Clamp(look.y, -lookAngle.y, lookAngle.y);
@@ -78,7 +107,9 @@ public class PlaneCamera : MonoBehaviour {
             avAverage = new Vector3();
 
             cameraOffset = deathOffset;
-        } else {
+        }
+        else
+        {
             var targetLookAngle = Vector2.Scale(lookInput, lookAngle);
             lookAverage = (lookAverage * (1 - lookAlpha)) + (targetLookAngle * lookAlpha);
 

@@ -1,6 +1,10 @@
 ﻿using Fusion;
 using UnityEngine;
 
+/// <summary>
+/// Represents a homing missile with tracking, explosion, and damage logic.
+/// It tracks a target and applies area damage on explosion.
+/// </summary>
 public class Missile : NetworkBehaviour
 {
     [SerializeField] private float lifetime;
@@ -19,8 +23,13 @@ public class Missile : NetworkBehaviour
     private Vector3 lastPosition;
 
     private Rigidbody rb;
+
+    // Exposes the Rigidbody reference.
     public Rigidbody Rigidbody => rb;
 
+    /// <summary>
+    /// Called when the missile is spawned. Initializes Rigidbody and disables graphics.
+    /// </summary>
     public override void Spawned()
     {
         rb = GetComponent<Rigidbody>();
@@ -28,6 +37,11 @@ public class Missile : NetworkBehaviour
         explosionGraphic.SetActive(false);
     }
 
+    /// <summary>
+    /// Launches the missile towards a target.
+    /// </summary>
+    /// <param name="owner">The Plane that fired the missile.</param>
+    /// <param name="target">The target the missile should track.</param>
     public void Launch(Plane owner, Target target)
     {
         this.owner = owner;
@@ -38,6 +52,9 @@ public class Missile : NetworkBehaviour
             target.NotifyMissileLaunched(this, true);
     }
 
+    /// <summary>
+    /// Handles movement, collision detection, and tracking logic.
+    /// </summary>
     public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority || exploded) return;
@@ -103,6 +120,10 @@ public class Missile : NetworkBehaviour
         lastPosition = currentPosition;
     }
 
+    /// <summary>
+    /// Rotates the missile to track the assigned target using physics-based calculations.
+    /// </summary>
+    /// <param name="dt">Delta time for this tick.</param>
     private void TrackTarget(float dt)
     {
         if (target == null) return;
@@ -131,6 +152,9 @@ public class Missile : NetworkBehaviour
         transform.rotation = Quaternion.LookRotation(newDir);
     }
 
+    /// <summary>
+    /// Handles the explosion of the missile and applies area-of-effect damage.
+    /// </summary>
     private void Explode()
     {
         if (exploded) return;

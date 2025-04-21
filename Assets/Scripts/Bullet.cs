@@ -1,6 +1,10 @@
 ﻿using Fusion;
 using UnityEngine;
 
+/// <summary>
+/// Represents a bullet fired from an aircraft. Handles movement, collision detection,
+/// and applies damage using RPC to the impacted target if authorized.
+/// </summary>
 public class Bullet : NetworkBehaviour
 {
     [SerializeField] private float speed = 100f;
@@ -11,6 +15,11 @@ public class Bullet : NetworkBehaviour
     private float timer;
     private Plane owner;
 
+    /// <summary>
+    /// Initializes the bullet with a reference to the firing plane.
+    /// Also ensures the bullet does not collide with the owner.
+    /// </summary>
+    /// <param name="owner">The Plane that fired the bullet.</param>
     public void Fire(Plane owner)
     {
         this.owner = owner;
@@ -29,6 +38,10 @@ public class Bullet : NetworkBehaviour
         Debug.Log($"🟢 Bala creada por: {owner.gameObject.name} con ID: {owner.GetInstanceID()}");
     }
 
+    /// <summary>
+    /// Handles movement and collision detection for the bullet.
+    /// If a valid target is hit and authority is held, damage is applied via RPC.
+    /// </summary>
     public override void FixedUpdateNetwork()
     {
         if (timer <= 0)
@@ -47,7 +60,7 @@ public class Bullet : NetworkBehaviour
 
             if (hitPlane != null)
             {
-                
+
                 Debug.Log($"🎯 Impactó a: {hitPlane.gameObject.name} con ID: {hitPlane.GetInstanceID()}");
 
                 if (hitPlane.Object.Id == owner.Object.Id)
@@ -62,7 +75,7 @@ public class Bullet : NetworkBehaviour
                 if (hitPlane.Object.Id != owner.Object.Id && HasStateAuthority)
                 {
                     Debug.Log("✅ Enviando RPC de daño al enemigo...");
-                    hitPlane.RPC_ApplyDamage(damage); // ✅ esto va al dueño real
+                    hitPlane.RPC_ApplyDamage(damage);
                 }
             }
 

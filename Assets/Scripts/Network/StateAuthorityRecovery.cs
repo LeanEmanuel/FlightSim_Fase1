@@ -1,13 +1,23 @@
 ﻿using Fusion;
 using UnityEngine;
 
+/// <summary>
+/// Detects loss of StateAuthority and recovers it by respawning the player's aircraft with proper authority.
+/// This prevents cases where a plane is still visible and controllable locally but no longer receives network updates.
+/// </summary>
 public class StateAuthorityRecovery : NetworkBehaviour
 {
-    [SerializeField] private NetworkObject playerPlanePrefab; // 👈 Asigna el prefab desde el editor
+
+    // Prefab reference used for respawning the player's aircraft.
+    // This should be assigned in the Unity Inspector.
+    [SerializeField] private NetworkObject playerPlanePrefab;
 
     private float checkInterval = 3f;
     private float timer;
 
+    /// <summary>
+    /// Called each network tick. Checks for authority loss and initiates recovery.
+    /// </summary>
     public override void FixedUpdateNetwork()
     {
         if (Object.HasInputAuthority && !Object.HasStateAuthority)
@@ -16,11 +26,11 @@ public class StateAuthorityRecovery : NetworkBehaviour
 
             if (timer >= checkInterval)
             {
-                Debug.LogWarning($"[🛑] {gameObject.name} perdió StateAuthority pero tiene InputAuthority.");
+                Debug.LogWarning($"[🛑] {gameObject.name} lost StateAuthority but has InputAuthority.");
 
                 if (Runner.IsServer) // solo el servidor puede hacer esto
                 {
-                    Debug.Log("🔁 Server va a forzar un respawn del objeto...");
+                    Debug.Log("🔁 Server is forcing object respawn to restore authority.");
 
                     var inputAuthority = Object.InputAuthority;
 
@@ -28,7 +38,7 @@ public class StateAuthorityRecovery : NetworkBehaviour
 
                     var newPlane = Runner.Spawn(playerPlanePrefab, transform.position, transform.rotation, inputAuthority);
 
-                    Debug.Log($"✅ Nuevo avión instanciado con autoridad restaurada: {newPlane.name}");
+                    Debug.Log($"✅ Respawned plane with restored StateAuthority: {newPlane.name}");
                 }
 
                 timer = 0;

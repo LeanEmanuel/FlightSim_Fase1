@@ -3,8 +3,14 @@ using Fusion;
 using Fusion.Sockets;
 using System.Collections.Generic;
 
+/// <summary>
+/// Captures and submits player input to the Fusion network system.
+/// </summary>
 public class PlaneInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
+    /// <summary>
+    /// Registers input callbacks when the component is enabled.
+    /// </summary>
     void OnEnable()
     {
         var runner = GetComponent<NetworkRunner>();
@@ -14,6 +20,11 @@ public class PlaneInputHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    /// <summary>
+    /// Called every tick to capture and send player input.
+    /// </summary>
+    /// <param name="runner">The NetworkRunner managing the simulation.</param>
+    /// <param name="input">The structure where input data will be stored.</param>
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
 
@@ -27,13 +38,13 @@ public class PlaneInputHandler : MonoBehaviour, INetworkRunnerCallbacks
             yaw = Input.GetKey(KeyCode.A) ? -1f : Input.GetKey(KeyCode.D) ? 1f : 0f,
             fireCannon = Input.GetKey(KeyCode.Space),
             fireMissile = Input.GetKeyDown(KeyCode.M),
-            
+
         };
         data.buttons.Set((int)PlaneButtons.ToggleHelp, Input.GetKey(KeyCode.H));
         input.Set(data);
     }
 
-    // otros callbacks vacíos...
+    // Optional callbacks required by INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

@@ -1,6 +1,10 @@
 ﻿using Fusion;
 using UnityEngine;
 
+/// <summary>
+/// Controls player input, HUD management, and dynamic target assignment for the aircraft.
+/// Handles both client-side control and authority-based logic for multiplayer synchronization.
+/// </summary>
 [RequireComponent(typeof(Plane))]
 public class PlaneNetworkController : NetworkBehaviour
 {
@@ -11,8 +15,15 @@ public class PlaneNetworkController : NetworkBehaviour
     private bool targetAssigned = false;
 
     [SerializeField] private GameObject hudPrefab;
+
+    // Stores the state of pressed buttons from the previous tick.
+    // Used for detecting button toggles.
     [Networked] private NetworkButtons PreviousButtons { get; set; }
 
+    /// <summary>
+    /// Called when the object is spawned on the network.
+    /// Sets up the HUD and assigns an initial target if the player has authority.
+    /// </summary>
     public override void Spawned()
     {
         plane = GetComponent<Plane>();
@@ -26,7 +37,7 @@ public class PlaneNetworkController : NetworkBehaviour
                 planeCam.SetPlane(plane);
             }
 
-            //Instanciar HUD SOLO para el jugador local
+            //Instantiate HUD only for the local player
             if (hudPrefab != null && mainCam != null)
             {
                 var hudInstance = Instantiate(hudPrefab);
@@ -42,6 +53,11 @@ public class PlaneNetworkController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Finds the nearest valid enemy target and assigns it to the plane.
+    /// Skips dead or self-assigned planes.
+    /// </summary>
+    /// <returns>True if a valid target was assigned; otherwise, false.</returns>
     public bool AssignTarget()
     {
         var allTargets = FindObjectsOfType<Target>();
@@ -71,18 +87,21 @@ public class PlaneNetworkController : NetworkBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Called every network tick. Handles input, HUD updates, and target reassignment logic.
+    /// </summary>
     public override void FixedUpdateNetwork()
     {
         if (plane == null) return; // protección contra null
-                                   
+
         if (targetAssigned && (plane.Target == null || plane.Target.Plane == null || plane.Target.Plane.Dead))
         {
-            Debug.LogWarning($"⚠️ Target inválido. Reasignando...");
+            Debug.LogWarning($"⚠️ Invalid target. Reassigning...");
             targetAssigned = false;
             plane.SetTarget(null);
         }
 
-        // Reintentar asignación si no hay target válido
+        // Try to reassign target every second if needed
         if (!targetAssigned)
         {
             retryAssignTimer -= Runner.DeltaTime;
@@ -94,11 +113,12 @@ public class PlaneNetworkController : NetworkBehaviour
                 }
                 else
                 {
-                    retryAssignTimer = 1f; // volver a intentar en 1 segundo
+                    retryAssignTimer = 1f; // 1 segundo
                 }
             }
         }
 
+        // Process input if this client has authority
         if (HasInputAuthority && GetInput<PlaneNetworkInput>(out var input))
         {
             plane.SetThrottleInput(input.throttle);
@@ -108,14 +128,14 @@ public class PlaneNetworkController : NetworkBehaviour
             if (input.fireMissile)
                 plane.TryFireMissile();
 
-            //Aquí evaluamos el botón solo si fue presionado este tick
+            // Evaluate the button only if this tick was pressed
             var pressed = input.buttons.GetPressed(PreviousButtons);
             if (pressed.IsSet((int)PlaneButtons.ToggleHelp))
             {
                 hud?.ToggleHelpDialogs();
             }
 
-            //Guardamos el estado actual como anterior
+            // Save the current state as previous
             PreviousButtons = input.buttons;
 
         }

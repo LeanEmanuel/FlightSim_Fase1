@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
+/// <summary>
+/// Controls the behavior and physics of the player-controlled aircraft,
+/// including flight mechanics, input handling, weapons, damage system,
+/// and network synchronization using Photon Fusion.
+/// </summary>
 public class Plane : NetworkBehaviour
 {
-    [Networked, OnChangedRender(nameof(OnHealthChanged))] 
+    [Networked, OnChangedRender(nameof(OnHealthChanged))]
     public float Health { get; private set; }
 
     [Networked] public float MaxHealth { get; private set; }
@@ -133,33 +138,7 @@ public class Plane : NetworkBehaviour
     float cannonFiringTimer;
     private bool previousMissileLocked;
 
-    public void InitHealth(float max)
-    {
-        MaxHealth = Mathf.Max(0, max);
-        Health = MaxHealth;
-    }
 
-
-    public void OnHealthChanged()
-    {
-        Debug.Log($"[HUD] Vida actualizada (cliente): {Health}");
-
-        if (Object.HasInputAuthority)
-        {
-            var hud = FindObjectOfType<PlaneHUD>();
-            if (hud != null)
-            {
-                hud.UpdateHealthBar(Health, MaxHealth);
-            }
-        }
-    }
-
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_ApplyDamage(float damage)
-    {
-        ApplyDamage(damage);
-    }
 
     public bool Dead { get; private set; }
 
@@ -208,6 +187,48 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Initializes the health of the aircraft based on a given maximum value.
+    /// </summary>
+    /// <param name="max">Maximum health to assign.</param>
+    public void InitHealth(float max)
+    {
+        MaxHealth = Mathf.Max(0, max);
+        Health = MaxHealth;
+    }
+
+    /// <summary>
+    /// Updates the HUD when health changes, called via OnChangedRender.
+    /// </summary>
+    public void OnHealthChanged()
+    {
+        Debug.Log($"[HUD] Vida actualizada (cliente): {Health}");
+
+        if (Object.HasInputAuthority)
+        {
+            var hud = FindObjectOfType<PlaneHUD>();
+            if (hud != null)
+            {
+                hud.UpdateHealthBar(Health, MaxHealth);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Remote Procedure Call (RPC) used to apply damage to this aircraft from another client.
+    /// This ensures that only the object with StateAuthority can modify the health value.
+    /// </summary>
+    /// <param name="damage">Amount of damage to apply.</param>
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ApplyDamage(float damage)
+    {
+        ApplyDamage(damage);
+    }
+
+    /// <summary>
+    /// Called automatically by Fusion when the object is spawned in the scene.
+    /// Initializes rigidbody and weapon systems.
+    /// </summary>
     public override void Spawned()
     {
         animation = GetComponent<PlaneAnimation>();
@@ -258,24 +279,39 @@ public class Plane : NetworkBehaviour
         Rigidbody.linearVelocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
     }
     */
+
+    /// <summary>
+    /// Sets the throttle input from the player. Range is typically between -1 and 1.
+    /// </summary>
+    /// <param name="input">Throttle input value.</param>
     public void SetThrottleInput(float input)
     {
         if (Dead) return;
         throttleInput = input;
     }
 
+    /// <summary>
+    /// Sets the control input vector for pitch, yaw, and roll.
+    /// </summary>
     public void SetControlInput(Vector3 input)
     {
         if (Dead) return;
         controlInput = Vector3.ClampMagnitude(input, 1);
     }
 
+    /// <summary>
+    /// Enables or disables cannon firing based on input state.
+    /// </summary>
+    /// <param name="input">True if firing, false otherwise.</param>
     public void SetCannonInput(bool input)
     {
         if (Dead) return;
         cannonFiring = input;
     }
 
+    /// <summary>
+    /// Toggles the deployment of flaps if under retract speed.
+    /// </summary>
     public void ToggleFlaps()
     {
         if (LocalVelocity.z < flapsRetractSpeed)
@@ -284,6 +320,10 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Applies damage to the aircraft, reducing its health.
+    /// Executed only on the object with StateAuthority.
+    /// </summary>
     public void ApplyDamage(float damage)
     {
 
@@ -293,6 +333,9 @@ public class Plane : NetworkBehaviour
         Debug.Log($"{gameObject.name} ha recibido {damage} de daño — Vida: {oldHealth} → {Health}");
     }
 
+    /// <summary>
+    /// Instantly disables control, triggers explosion visuals and marks plane as dead.
+    /// </summary>
     void Die()
     {
         throttleInput = 0;
@@ -304,6 +347,11 @@ public class Plane : NetworkBehaviour
         deathEffect.SetActive(true);
     }
 
+    /// <summary>
+    /// Updates the aircraft throttle gradually based on input and throttleSpeed.
+    /// Also controls the airbrake deployment.
+    /// </summary>
+    /// <param name="dt">Delta time since last tick.</param>
     void UpdateThrottle(float dt)
     {
         float target = 0;
@@ -331,6 +379,9 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Automatically retracts flaps if the forward velocity exceeds the threshold.
+    /// </summary>
     void UpdateFlaps()
     {
         if (LocalVelocity.z > flapsRetractSpeed)
@@ -339,6 +390,9 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Calculates the Angle of Attack (AoA) and yaw AoA for lift computation.
+    /// </summary>
     void CalculateAngleOfAttack()
     {
         if (LocalVelocity.sqrMagnitude < 0.1f)
@@ -352,6 +406,10 @@ public class Plane : NetworkBehaviour
         AngleOfAttackYaw = Mathf.Atan2(LocalVelocity.x, LocalVelocity.z);
     }
 
+    /// <summary>
+    /// Calculates G-force experienced by the plane based on acceleration.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void CalculateGForce(float dt)
     {
         var invRotation = Quaternion.Inverse(Rigidbody.rotation);
@@ -360,6 +418,10 @@ public class Plane : NetworkBehaviour
         lastVelocity = Velocity;
     }
 
+    /// <summary>
+    /// Calculates velocity, local velocity and angular velocity of the aircraft.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void CalculateState(float dt)
     {
         var invRotation = Quaternion.Inverse(Rigidbody.rotation);
@@ -370,11 +432,17 @@ public class Plane : NetworkBehaviour
         CalculateAngleOfAttack();
     }
 
+    /// <summary>
+    /// Applies forward thrust force based on throttle input.
+    /// </summary>
     void UpdateThrust()
     {
         Rigidbody.AddRelativeForce(Throttle * maxThrust * Vector3.forward);
     }
 
+    /// <summary>
+    /// Applies aerodynamic drag based on the aircraft’s current velocity and drag curves.
+    /// </summary>
     void UpdateDrag()
     {
         var lv = LocalVelocity;
@@ -397,6 +465,16 @@ public class Plane : NetworkBehaviour
         Rigidbody.AddRelativeForce(drag);
     }
 
+    /// <summary>
+    /// Calculates the aerodynamic lift and induced drag based on angle of attack, local velocity,
+    /// and wing orientation. Returns the total force vector to apply to the aircraft.
+    /// </summary>
+    /// <param name="angleOfAttack">The angle between the chord line of the wing and the direction of airflow (in radians).</param>
+    /// <param name="rightAxis">The local axis perpendicular to the lift-producing surface (usually Vector3.right or Vector3.up).</param>
+    /// <param name="liftPower">The lift force multiplier for the surface.</param>
+    /// <param name="aoaCurve">The lift coefficient curve based on angle of attack (AOA).</param>
+    /// <param name="inducedDragCurve">The drag coefficient curve based on forward velocity.</param>
+    /// <returns>A Vector3 representing the lift and induced drag force to apply.</returns>
     Vector3 CalculateLift(float angleOfAttack, Vector3 rightAxis, float liftPower, AnimationCurve aoaCurve, AnimationCurve inducedDragCurve)
     {
         var liftVelocity = Vector3.ProjectOnPlane(LocalVelocity, rightAxis);    //project velocity onto YZ plane
@@ -419,6 +497,9 @@ public class Plane : NetworkBehaviour
         return lift + inducedDrag;
     }
 
+    /// <summary>
+    /// Calculates and applies aerodynamic lift and yaw force using AoA and lift curves.
+    /// </summary>
     void UpdateLift()
     {
         if (LocalVelocity.sqrMagnitude < 1f) return;
@@ -439,6 +520,9 @@ public class Plane : NetworkBehaviour
         Rigidbody.AddRelativeForce(yawForce);
     }
 
+    /// <summary>
+    /// Calculates and applies angular drag to simulate resistance to rotation.
+    /// </summary>
     void UpdateAngularDrag()
     {
         var av = LocalAngularVelocity;
@@ -457,6 +541,12 @@ public class Plane : NetworkBehaviour
         return Vector3.Cross(angularVelocity, velocity);
     }
 
+    /// <summary>
+    /// Calculates the maximum allowed G-force in each axis based on pilot input.
+    /// Scales pitch, yaw, and roll limits accordingly and returns a force vector.
+    /// </summary>
+    /// <param name="input">The control input direction vector (usually normalized).</param>
+    /// <returns>The maximum G-force vector allowed in each axis (in m/s²).</returns>
     Vector3 CalculateGForceLimit(Vector3 input)
     {
         return Utilities.Scale6(input,
@@ -466,6 +556,13 @@ public class Plane : NetworkBehaviour
         ) * 9.81f;
     }
 
+    /// <summary>
+    /// Calculates a limiter factor to scale down the control input if the expected G-force
+    /// would exceed the configured limits of the aircraft structure.
+    /// </summary>
+    /// <param name="controlInput">The normalized control input vector (pitch, yaw, roll).</param>
+    /// <param name="maxAngularVelocity">The maximum angular velocity for each axis.</param>
+    /// <returns>A float between 0 and 1 representing how much to scale the input down.</returns>
     float CalculateGLimiter(Vector3 controlInput, Vector3 maxAngularVelocity)
     {
         if (controlInput.magnitude < 0.01f)
@@ -490,6 +587,14 @@ public class Plane : NetworkBehaviour
         return 1;
     }
 
+    /// <summary>
+    /// Calculates the steering correction value for one axis based on acceleration constraints.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
+    /// <param name="angularVelocity">Current angular velocity.</param>
+    /// <param name="targetVelocity">Target angular velocity.</param>
+    /// <param name="acceleration">Acceleration limit.</param>
+    /// <returns>Steering correction value.</returns>
     float CalculateSteering(float dt, float angularVelocity, float targetVelocity, float acceleration)
     {
         var error = targetVelocity - angularVelocity;
@@ -497,6 +602,10 @@ public class Plane : NetworkBehaviour
         return Mathf.Clamp(error, -accel, accel);
     }
 
+    /// <summary>
+    /// Calculates and applies angular corrections based on control input and G-limiter.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void UpdateSteering(float dt)
     {
         var speed = Mathf.Max(0, LocalVelocity.z);
@@ -530,6 +639,9 @@ public class Plane : NetworkBehaviour
         );
     }
 
+    /// <summary>
+    /// Fires a missile from the next available hardpoint.
+    /// </summary>
     public void TryFireMissile()
     {
         if (Dead) return;
@@ -552,6 +664,10 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Spawns and fires a missile from a specific hardpoint index.
+    /// </summary>
+    /// <param name="index">Hardpoint index.</param>
     void FireMissile(int index)
     {
         var hardpoint = hardpoints[index];
@@ -562,6 +678,10 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates missile firing, locking and cannon fire.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void UpdateWeapons(float dt)
     {
         UpdateWeaponCooldown(dt);
@@ -569,6 +689,11 @@ public class Plane : NetworkBehaviour
         UpdateCannon(dt);
     }
 
+    /// <summary>
+    /// Updates the missile and cannon cooldown timers.
+    /// Also resets visual indicators if missiles are reloaded.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void UpdateWeaponCooldown(float dt)
     {
         missileDebounceTimer = Mathf.Max(0, missileDebounceTimer - dt);
@@ -586,6 +711,10 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Computes missile lock state based on angle and distance to current target.
+    /// </summary>
+    /// <param name="dt">Delta time.</param>
     void UpdateMissileLock(float dt)
     {
         //default neutral position is forward
@@ -617,6 +746,9 @@ public class Plane : NetworkBehaviour
         previousMissileLocked = MissileLocked;
     }
 
+    /// <summary>
+    /// Fires a cannon bullet with spread and cooldown.
+    /// </summary>
     void UpdateCannon(float dt)
     {
         if (cannonFiring && cannonFiringTimer == 0)
@@ -634,19 +766,26 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Assigns a new target for missiles and HUD locking.
+    /// </summary>
+    /// <param name="newTarget">The new target to lock onto.</param>
     public void SetTarget(Target newTarget)
     {
         if (!HasStateAuthority) return;
         target = newTarget;
     }
 
+    /// <summary>
+    /// Main update loop for the aircraft. Handles physics and control logic.
+    /// </summary>
     public override void FixedUpdateNetwork()
     {
         float dt = Runner.DeltaTime;
         CheckAndRecoverAuthority();
 
         if (HasStateAuthority == false) return;
-        
+
 
         //calculate at start, to capture any changes that happened externally
         CalculateState(dt);
@@ -694,6 +833,10 @@ public class Plane : NetworkBehaviour
             Die();
         }
     }
+
+    /// <summary>
+    /// Checks if the aircraft has lost StateAuthority and attempts to recover it via respawn.
+    /// </summary>
     private void CheckAndRecoverAuthority()
     {
         if (Object.HasInputAuthority && !Object.HasStateAuthority)
@@ -710,6 +853,10 @@ public class Plane : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles damage and destruction on collision with the environment.
+    /// </summary>
+    /// <param name="collision">Collision information from Unity's physics system.</param>
     void OnCollisionEnter(Collision collision)
     {
         for (int i = 0; i < collision.contactCount; i++)
